@@ -1,7 +1,7 @@
 import bcrypt
 
 
-def validate_password(self, password_candidate):
+def validate_password(password_candidate):
     validation_errors = []
     if len(password_candidate) < 8:
         validation_errors.append(
@@ -15,7 +15,7 @@ def validate_password(self, password_candidate):
     return validation_errors
 
 
-def save_password(self, password):
+def save_password(password):
     password = password.encode('utf-8')
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password, salt)
@@ -24,7 +24,7 @@ def save_password(self, password):
     secrets.close()
 
 
-def password_is_correct(self, password_attempt):
+def password_is_correct(password_attempt):
     password_attempt = password_attempt.encode('utf-8')
     saved_password_file = open('password.bfe', 'r')
     if saved_password_file.mode == 'r':
