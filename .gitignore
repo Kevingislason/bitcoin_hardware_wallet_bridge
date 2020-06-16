@@ -1,3 +1,6 @@
 venv
 *.conf
 *.bfe
+*.ini
+*.Python
+__pycache__/
