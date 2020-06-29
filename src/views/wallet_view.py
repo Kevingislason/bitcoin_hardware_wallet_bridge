@@ -5,10 +5,11 @@ from functools import partial
 
 
 class WalletView(QWidget):
-    VIEW_INDEX = 2
+    VIEW_INDEX = 1
 
-    def __init__(self):
+    def __init__(self, change_view):
         super().__init__()
+        self.change_view = change_view
 
         self.layout = QGridLayout()
         self.setLayout(self.layout)

@@ -1,4 +1,4 @@
-from src.network.network_client_interface import NetworkClientInterface
+from network.network_client_interface import NetworkClientInterface
 
 
 class NodeClient(NetworkClientInterface):

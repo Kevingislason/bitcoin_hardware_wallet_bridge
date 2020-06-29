@@ -6,5 +6,5 @@ class NetworkClientInterface():
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def get_utxos(address_list: List[str]) -> List[int]:
+    def get_utxos(self, address_list: List[str]) -> List[int]:
         pass
