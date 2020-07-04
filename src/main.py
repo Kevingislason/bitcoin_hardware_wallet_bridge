@@ -5,15 +5,16 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from views.awaiting_serial_connection_view import AwaitingSerialConnectionView
 from views.wallet_view import WalletView
+from network.block_explorer_client import BlockExplorerClient
 
 
 class App(QMainWindow):
 
     def __init__(self):
-
         super().__init__()
+        if not path.exists("config.ini"):
+            self.init_config_file()
         self.init_ui()
-
         if not self.wallet_is_connected():
             self.change_view(AwaitingSerialConnectionView.VIEW_INDEX)
         else:
@@ -39,6 +40,9 @@ class App(QMainWindow):
         # todo: add settings page
         self.show()
 
+    def change_view(self, new_view_index):
+        self.central_widget.setCurrentIndex(new_view_index)
+
     # todo: implement
     def wallet_is_connected(self):
         return False
@@ -48,10 +52,9 @@ class App(QMainWindow):
 
     def init_config_file(self):
         config = configparser.ConfigParser()
-        # todo: what default configs do I actually need?
+        config['Network client'] = BlockExplorerClient.NETWORK_CLIENT_TYPE
         with open('config.ini', 'w+') as configfile:
             config.write(configfile)
-
         configfile.close()
 
 
@@ -62,6 +65,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
-    # from network.block_explorer_client import BlockExplorerClient
-    # BlockExplorerClient().get_utxos(["1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"])
+    # main()
+    from network.block_explorer_client import BlockExplorerClient
+    BlockExplorerClient().get_utxos(["14rE7Jqy4a6P27qWCCsngkUfBxtevZhPHB"])

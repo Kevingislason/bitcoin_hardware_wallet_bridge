@@ -1,5 +1,3 @@
-
-
 class UTXO():
     amount: int
 
