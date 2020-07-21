@@ -1,70 +1,90 @@
-from os import path
-import sys
 import configparser
-from PyQt5.QtWidgets import *
+import sys
+from os import path
+from models.watch_only_wallet import WatchOnlyWallet
+from persistence.wallet_file import WalletFile
+
 from PyQt5.QtCore import *
-from views.awaiting_serial_connection_view import AwaitingSerialConnectionView
+from PyQt5.QtWidgets import *
+
+from controllers.main_controller import MainController
+from models.serial_connection_state import SerialConnectionState
+from models.watch_only_wallet import WatchOnlyWallet
+from networking.blockchain.block_explorer_client import BlockExplorerClient
+from networking.serial.serial_client import SerialClient
+from persistence.config import (
+    Config, NetworkClient, BalanceUnits, ChainParameters
+)
+from persistence.wallet_file import WalletFile
+from views.initialize_wallet_view import InitializeWalletView
 from views.wallet_view import WalletView
-from network.block_explorer_client import BlockExplorerClient
 
 
-class App(QMainWindow):
+class BitcoinHardwareWalletBridge(QMainWindow):
+    main_controller: MainController
+
+    serial_connection_state: SerialConnectionState
+    watch_only_wallet: WatchOnlyWallet
+
+    initialize_wallet_view: InitializeWalletView
+    wallet_view: WalletView
 
     def __init__(self):
         super().__init__()
         if not path.exists("config.ini"):
-            self.init_config_file()
+            Config.set_defaults()
+
         self.init_ui()
-        if not self.wallet_is_connected():
-            self.change_view(AwaitingSerialConnectionView.VIEW_INDEX)
-        else:
+
+        # Init models
+        self.watch_only_wallet = WatchOnlyWallet()
+        self.serial_connection_state = SerialConnectionState()
+
+        self.controller = MainController(
+            self.watch_only_wallet, self.serial_connection_state)
+
+        # Init views
+        self.initialize_wallet_view = InitializeWalletView(
+            self.serial_connection_state, self.controller)
+        self.central_widget.addWidget(self.initialize_wallet_view)
+
+        self.wallet_view = WalletView(
+            self.watch_only_wallet, self.serial_connection_state, self.controller)
+        self.central_widget.addWidget(self.wallet_view)
+
+        if WalletFile.exists():
             self.change_view(WalletView.VIEW_INDEX)
 
     def init_ui(self):
         # Set window title
-        CONST_WINDOW_TITLE = "Bitcoin Wallet"
-        self.setWindowTitle(CONST_WINDOW_TITLE)
+        WINDOW_TITLE = "Bitcoin Wallet"
+        self.setWindowTitle(WINDOW_TITLE)
         # Set window size
-        CONST_DEFAULT_LEFT = 10
-        CONST_DEFAULT_TOP = 10
-        CONST_DEFAULT_WIDTH = 750
-        CONST_DEFAULT_HEIGHT = 500
-        self.setGeometry(CONST_DEFAULT_LEFT, CONST_DEFAULT_TOP,
-                         CONST_DEFAULT_WIDTH, CONST_DEFAULT_HEIGHT)
-        # Init application "pages"
+        DEFAULT_LEFT = 10
+        DEFAULT_TOP = 10
+        DEFAULT_WIDTH = 750
+        DEFAULT_HEIGHT = 500
+        self.setGeometry(DEFAULT_LEFT, DEFAULT_TOP,
+                         DEFAULT_WIDTH, DEFAULT_HEIGHT)
+        # Create app "pages"
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
-        self.central_widget.addWidget(
-            AwaitingSerialConnectionView(self.change_view))
-        self.central_widget.addWidget(WalletView(self.change_view))
-        # todo: add settings page
         self.show()
 
-    def change_view(self, new_view_index):
+    def change_view(self, new_view_index: int):
         self.central_widget.setCurrentIndex(new_view_index)
 
-    # todo: implement
-    def wallet_is_connected(self):
-        return False
-
-    def is_first_login(self):
-        return not path.exists("config.ini")
-
     def init_config_file(self):
-        config = configparser.ConfigParser()
-        config['Network client'] = BlockExplorerClient.NETWORK_CLIENT_TYPE
-        with open('config.ini', 'w+') as configfile:
-            config.write(configfile)
-        configfile.close()
+        Config.set_network_client(NetworkClient.BLOCK_EXPLORER)
+        Config.set_chain_parameters(ChainParameters.MAINNET)
+        Config.set_balance_display_units(BalanceDisplayUnits.BTC)
 
 
 def main():
     app = QApplication(sys.argv)
-    ex = App()
+    ex = BitcoinHardwareWalletBridge()
     sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
-    # main()
-    from network.block_explorer_client import BlockExplorerClient
-    BlockExplorerClient().get_utxos(["14rE7Jqy4a6P27qWCCsngkUfBxtevZhPHB"])
+    main()

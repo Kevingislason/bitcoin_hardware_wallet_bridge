@@ -1,13 +1,12 @@
-from network.network_client_interface import NetworkClientInterface
-from errors.block_explorer_api_error import BlockExplorerAPIError
 import json
 import requests
 
+from errors.block_explorer_api_error import BlockExplorerAPIError
+from networking.blockchain.blockchain_client_interface import BlockchainClientInterface
 
-class BlockExplorerClient(NetworkClientInterface):
-    NETWORK_CLIENT_TYPE = "Block explorer"
 
-    def get_utxos(self, addresses):
+class BlockExplorerClient(BlockchainClientInterface):
+    def get_tx_ins(self, addresses):
         utxos = []
 
         # Get up to 1000 utxos for each address
@@ -21,5 +20,6 @@ class BlockExplorerClient(NetworkClientInterface):
 
         utxos = json.loads(response.text)
         print(utxos)
+
         # todo: convert to UXTO type
         return utxos

@@ -1,5 +1,4 @@
 class BlockExplorerAPIError(Exception):
-
     status: int
 
     def __init__(self, status):
