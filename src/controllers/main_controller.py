@@ -35,7 +35,8 @@ class MainController():
         # Tell bitcointx whether to use mainnet, testnet, or regtest
         bitcointx.select_chain_params(Config.get_chain_parameters())
 
-        # print(self.watch_only_wallet.spendable_balance_satoshis)
-
     def send_transaction(self):
         self.watch_only_wallet.spendable_balance_satoshis = 999
+
+        self.blockchain_client.get_txins(
+            ["1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"])
