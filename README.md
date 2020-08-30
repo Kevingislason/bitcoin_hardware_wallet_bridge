@@ -1,2 +1,2 @@
-# bitcoin_hardware_wallet_bridge
+# bitcoin_hardware_wallet_bridge (WIP)
 Desktop application to get blockchain data and initialize transactions for my Bitcoin hardware wallet to sign
