@@ -1,0 +1,31 @@
+{
+    "master_xpub": "tpubD6NzVbkrYhZ4YeGcbzn5YXU24FkAErRtedfMj7b9Rr2cW9WFSVE4DNtd6fBay4YAWJkkRZtmfmPnBtiizC9Q9idRmrijZ1D61Yfov15dD8F",
+    "address_type": "T_P2PKHCoinAddress",
+    "current_block": {
+        "hash": "00000000a4f79f78d1699f1a0bdc22ff747764348d22c17dfafdeda667c06b15",
+        "number": 1863197,
+        "prev_hash": "00000000000000b1502206936507df554d843801c2050f5ae9ab0bb42a5bf245"
+    },
+    "external_addresses": [
+        {
+            "is_fresh": false,
+            "was_recovered": false,
+            "tx_ins": [
+                {
+                    "satoshi_value": 100000,
+                    "is_awaiting_spend": false,
+                    "block": {
+                        "hash": "00000000000000ef46962afbc2bebc0f871b1e538c4936bc30d8497e0f1efb16",
+                        "number": 1837090,
+                        "prev_hash": null
+                    },
+                    "prevout": {
+                        "hash": "2977a38ee89bace43dccc383959738f85cd20080e8de46bc513364df65320ccf",
+                        "n": 0
+                    }
+                }
+            ]
+        }
+    ],
+    "change_addresses": []
+}

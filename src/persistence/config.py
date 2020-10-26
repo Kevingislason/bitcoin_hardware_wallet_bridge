@@ -4,12 +4,12 @@ from typing import Any
 
 
 class Field:
-    NETWORK_CLIENT = "Network client"
+    BLOCKCHAIN_CLIENT = "Blockchain client"
     CHAIN_PARAMETERS = "Chain parameters"
     BALANCE_UNITS = "Balance units"
 
 
-class NetworkClient:
+class BlockchainClient:
     BLOCK_EXPLORER = "Block explorer"
     BITCOIN_NODE = "Bitcoin node"
 
@@ -38,14 +38,12 @@ class Config:
     def set_defaults(cls):
         config = configparser.ConfigParser()
         config.add_section("Config")
-        # config.add_section(Field.CHAIN_PARAMETERS)
-        # config.add_section(Field.NETWORK_CLIENT)
 
         config.set("Config", str(Field.BALANCE_UNITS), str(BalanceUnits.BTC))
         config.set("Config", str(Field.CHAIN_PARAMETERS),
-                   str(ChainParameters.MAINNET))
-        config.set("Config", str(Field.NETWORK_CLIENT),
-                   str(NetworkClient.BLOCK_EXPLORER))
+                   str(ChainParameters.TESTNET))
+        config.set("Config", str(Field.BLOCKCHAIN_CLIENT),
+                   str(BlockchainClient.BLOCK_EXPLORER))
 
         with open(cls.PATH, 'w+') as configfile:
             config.write(configfile)
@@ -65,12 +63,12 @@ class Config:
         configfile.close()
 
     @classmethod
-    def get_network_client(cls) -> NetworkClient:
-        return cls.get(Field.NETWORK_CLIENT)
+    def get_blockchain_client(cls) -> BlockchainClient:
+        return cls.get(Field.BLOCKCHAIN_CLIENT)
 
     @classmethod
-    def set_network_client(cls, network_client: NetworkClient):
-        cls.set(Field.NETWORK_CLIENT, network_client)
+    def set_blockchain_client(cls, blockchain_client: BlockchainClient):
+        cls.set(Field.BLOCKCHAIN_CLIENT, blockchain_client)
 
     @classmethod
     def get_chain_parameters(cls) -> ChainParameters:

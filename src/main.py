@@ -1,11 +1,10 @@
 import configparser
 import sys
 from os import path
-from models.watch_only_wallet import WatchOnlyWallet
-from persistence.wallet_file import WalletFile
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QFont
 
 from controllers.main_controller import MainController
 from models.serial_connection_state import SerialConnectionState
@@ -13,10 +12,11 @@ from models.watch_only_wallet import WatchOnlyWallet
 from networking.blockchain.block_explorer_client import BlockExplorerClient
 from networking.serial.serial_client import SerialClient
 from persistence.config import (
-    Config, NetworkClient, BalanceUnits, ChainParameters
+    Config, BlockchainClient, BalanceUnits, ChainParameters
 )
 from persistence.wallet_file import WalletFile
 from views.initialize_wallet_view import InitializeWalletView
+from views.status_bar_view import StatusBarView
 from views.wallet_view import WalletView
 
 
@@ -28,10 +28,11 @@ class BitcoinHardwareWalletBridge(QMainWindow):
 
     initialize_wallet_view: InitializeWalletView
     wallet_view: WalletView
+    status_bar_view :StatusBarView
 
     def __init__(self):
         super().__init__()
-        if not path.exists("config.ini"):
+        if not Config.exists():
             Config.set_defaults()
 
         self.init_ui()
@@ -40,17 +41,21 @@ class BitcoinHardwareWalletBridge(QMainWindow):
         self.watch_only_wallet = WatchOnlyWallet()
         self.serial_connection_state = SerialConnectionState()
 
-        self.controller = MainController(
+        self.main_controller = MainController (
             self.watch_only_wallet, self.serial_connection_state)
 
         # Init views
-        self.initialize_wallet_view = InitializeWalletView(
-            self.serial_connection_state, self.controller)
-        self.central_widget.addWidget(self.initialize_wallet_view)
-
+        self.initialize_wallet_view = InitializeWalletView()
         self.wallet_view = WalletView(
-            self.watch_only_wallet, self.serial_connection_state, self.controller)
+            self.main_controller,
+            self.watch_only_wallet,
+            self.serial_connection_state,
+        )
+        self.status_bar_view = StatusBarView(self.watch_only_wallet, self.serial_connection_state)
+
+        self.central_widget.addWidget(self.initialize_wallet_view)
         self.central_widget.addWidget(self.wallet_view)
+        self.setStatusBar(self.status_bar_view)
 
         if WalletFile.exists():
             self.change_view(WalletView.VIEW_INDEX)
@@ -60,10 +65,10 @@ class BitcoinHardwareWalletBridge(QMainWindow):
         WINDOW_TITLE = "Bitcoin Wallet"
         self.setWindowTitle(WINDOW_TITLE)
         # Set window size
-        DEFAULT_LEFT = 10
-        DEFAULT_TOP = 10
-        DEFAULT_WIDTH = 750
-        DEFAULT_HEIGHT = 500
+        DEFAULT_LEFT = 0
+        DEFAULT_TOP = 0
+        DEFAULT_WIDTH = 950
+        DEFAULT_HEIGHT = 600
         self.setGeometry(DEFAULT_LEFT, DEFAULT_TOP,
                          DEFAULT_WIDTH, DEFAULT_HEIGHT)
         # Create app "pages"
@@ -74,14 +79,11 @@ class BitcoinHardwareWalletBridge(QMainWindow):
     def change_view(self, new_view_index: int):
         self.central_widget.setCurrentIndex(new_view_index)
 
-    def init_config_file(self):
-        Config.set_network_client(NetworkClient.BLOCK_EXPLORER)
-        Config.set_chain_parameters(ChainParameters.MAINNET)
-        Config.set_balance_display_units(BalanceDisplayUnits.BTC)
-
 
 def main():
     app = QApplication(sys.argv)
+    font = QFont("Courier", 15)
+    app.setFont(font)
     ex = BitcoinHardwareWalletBridge()
     sys.exit(app.exec_())
 

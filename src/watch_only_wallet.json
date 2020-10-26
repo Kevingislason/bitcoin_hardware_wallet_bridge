@@ -1,0 +1,56 @@
+{
+    "master_xpub": "tpubD6NzVbkrYhZ4YeGcbzn5YXU24FkAErRtedfMj7b9Rr2cW9WFSVE4DNtd6fBay4YAWJkkRZtmfmPnBtiizC9Q9idRmrijZ1D61Yfov15dD8F",
+    "address_type": "T_P2PKHCoinAddress",
+    "current_block": {
+        "hash": "0000000000000049515b347ff7606f91219b4a88ca105bcf6e51befe09864a5a",
+        "number": 1864715,
+        "prev_hash": "0000000000000068e0a553294e47bd90db0be5fc1b79fc08c1771a3926d409c4"
+    },
+    "external_addresses": [
+        {
+            "was_recovered": true,
+            "is_fresh": false,
+            "tx_ins": [
+                {
+                    "satoshi_value": 100000,
+                    "is_awaiting_spend": false,
+                    "block": {
+                        "hash": "00000000000000ef46962afbc2bebc0f871b1e538c4936bc30d8497e0f1efb16",
+                        "number": 1837090,
+                        "prev_hash": null
+                    },
+                    "prevout": {
+                        "hash": "2977a38ee89bace43dccc383959738f85cd20080e8de46bc513364df65320ccf",
+                        "n": 0
+                    }
+                }
+            ],
+            "label": null
+        },
+        {
+            "was_recovered": false,
+            "is_fresh": true,
+            "tx_ins": [],
+            "label": "AA"
+        },
+        {
+            "was_recovered": false,
+            "is_fresh": true,
+            "tx_ins": [],
+            "label": "BB"
+        },
+        {
+            "was_recovered": false,
+            "is_fresh": true,
+            "tx_ins": [],
+            "label": "AAcc"
+        },
+        {
+            "was_recovered": false,
+            "is_fresh": true,
+            "tx_ins": [],
+            "label": "ABC"
+        }
+    ],
+    "change_addresses": []
+}

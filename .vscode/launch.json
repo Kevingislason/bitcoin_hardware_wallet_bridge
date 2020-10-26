@@ -5,11 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Current File",
+      "name": "Wallet bridge main",
       "type": "python",
       "request": "launch",
-      "program": "${file}",
-      "console": "integratedTerminal"
+      "program": "${workspaceFolder}/src/main.py",
+      "console": "integratedTerminal",
+      "justMyCode": false
     }
   ]
 }

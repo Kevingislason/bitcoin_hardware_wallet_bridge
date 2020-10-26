@@ -15,7 +15,7 @@ class InitializeWalletView(QWidget):
     layout: QVBoxLayout
     connect_hardware_wallet_instruction_label: QLabel
 
-    def __init__(self, serial_connection_state: SerialConnectionState, controller: MainController):
+    def __init__(self):
         super().__init__()
 
         self.layout = QVBoxLayout()
