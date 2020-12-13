@@ -5,8 +5,6 @@ from controllers.main_controller import MainController
 from models.watch_only_wallet import WatchOnlyWallet
 
 
-
-
 class AddressListView(QFrame):
     controller: MainController
     watch_only_wallet: WatchOnlyWallet
@@ -17,7 +15,6 @@ class AddressListView(QFrame):
       self.watch_only_wallet = watch_only_wallet
 
       # Address details
-      # self.address_detail_frame.setFrameShape(QFrame.StyledPanel)
       self.size_policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
       self.size_policy.setHorizontalStretch(2)
       self.setSizePolicy(self.size_policy)
@@ -39,7 +36,8 @@ class AddressListView(QFrame):
       for address in self.watch_only_wallet.ui_addresses:
           address_widget = QListWidgetItem(address.label)
           icon_style = QStyle.SP_DialogYesButton if address.is_fresh else QStyle.SP_DialogNoButton
-          address_widget.setIcon(self.style().standardIcon(icon_style))
+          icon = self.style().standardIcon(icon_style)
+          address_widget.setIcon(icon)
           self.list.addItem(address_widget)
       if self.watch_only_wallet.ui_addresses:
           self.list.setCurrentRow(0)
@@ -71,7 +69,8 @@ class AddressListView(QFrame):
         new_address = self.controller.derive_external_address(address_label)
         address_widget = QListWidgetItem(address_label)
         icon_style = QStyle.SP_DialogYesButton
-        address_widget.setIcon(self.style().standardIcon(icon_style))
+        icon = self.style().standardIcon(icon_style)
+        address_widget.setIcon(icon)
         self.list.clearSelection()
         self.list.insertItem(0, address_widget)
         self.list.setCurrentRow(0)

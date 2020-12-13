@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QFont
 
 from controllers.main_controller import MainController
-from models.serial_connection_state import SerialConnectionState
 from models.watch_only_wallet import WatchOnlyWallet
 from networking.blockchain.block_explorer_client import BlockExplorerClient
 from networking.serial.serial_client import SerialClient
@@ -23,7 +22,6 @@ from views.wallet_view import WalletView
 class BitcoinHardwareWalletBridge(QMainWindow):
     main_controller: MainController
 
-    serial_connection_state: SerialConnectionState
     watch_only_wallet: WatchOnlyWallet
 
     initialize_wallet_view: InitializeWalletView
@@ -39,19 +37,13 @@ class BitcoinHardwareWalletBridge(QMainWindow):
 
         # Init models
         self.watch_only_wallet = WatchOnlyWallet()
-        self.serial_connection_state = SerialConnectionState()
 
-        self.main_controller = MainController (
-            self.watch_only_wallet, self.serial_connection_state)
+        self.main_controller = MainController(self.watch_only_wallet)
 
         # Init views
         self.initialize_wallet_view = InitializeWalletView()
-        self.wallet_view = WalletView(
-            self.main_controller,
-            self.watch_only_wallet,
-            self.serial_connection_state,
-        )
-        self.status_bar_view = StatusBarView(self.watch_only_wallet, self.serial_connection_state)
+        self.wallet_view = WalletView(self.main_controller, self.watch_only_wallet)
+        self.status_bar_view = StatusBarView(self.main_controller, self.watch_only_wallet)
 
         self.central_widget.addWidget(self.initialize_wallet_view)
         self.central_widget.addWidget(self.wallet_view)

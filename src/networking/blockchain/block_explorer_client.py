@@ -3,22 +3,26 @@ import requests
 from typing import List, Optional, Tuple, Union
 
 from bitcointx.core import (
-    COutPoint as OutPoint, lx
+    COutPoint as OutPoint,
+    CMutableTxIn as TxIn,
+    CMutableTxOut as TxOut,
+    lx
 )
 from bitcointx.wallet import (
     CCoinAddress as Address,
 )
 
 from bitcoin_types.block import Block
-from bitcoin_types.tx_in import TxIn
+from bitcoin_types.utxo import Utxo
 from constants.money_constants import SATOSHIS_PER_COIN
 from persistence.config import Config, ChainParameters
 from errors.block_explorer_api_error import BlockExplorerAPIError
 from networking.blockchain.blockchain_client_interface import BlockchainClientInterface
 
-#todo: pull requests.get into a helper method
+
 class BlockExplorerClient(BlockchainClientInterface):
     URL = "https://sochain.com/api/v2/{query}/{network}/{param}"
+    FEE_URL = "https://api.blockchain.info/mempool/fees"
 
     class Query:
         TX = "tx"
@@ -40,6 +44,16 @@ class BlockExplorerClient(BlockchainClientInterface):
             self.network = self.Network.MAINNET
         elif chain_parameters == ChainParameters.TESTNET:
             self.network = self.Network.TESTNET
+
+
+    def get_current_fee_rate(self, is_priority: bool):
+        response = requests.get(self.FEE_URL)
+        if response.status_code != 200 and response.status_code != 404:
+            raise BlockExplorerAPIError(response.status_code)
+        if is_priority:
+            return json.loads(response.text)["priority"]
+        else:
+            return json.loads(response.text)["regular"]
 
 
     def get_most_recent_block(self) -> Block:
@@ -83,20 +97,23 @@ class BlockExplorerClient(BlockchainClientInterface):
         return len(received_payments) > 0
 
 
-    def get_tx_ins_by_address(self, address: Address) -> List[TxIn]:
-        raw_tx_ins = self.query_api(self.Query.GET_UNSPENT_TX, str(address))["txs"]
-        tx_ins: List[TxIn] = []
+    def get_utxos_by_address(self, address: Address) -> List[Utxo]:
+        raw_utxos = self.query_api(self.Query.GET_UNSPENT_TX, str(address))["txs"]
+        utxos: List[Utxo] = []
 
-        for raw_tx_in in raw_tx_ins:
-            satoshi_value = int(float(raw_tx_in["value"]) * SATOSHIS_PER_COIN)
-            tx_hash = raw_tx_in["txid"]
+        for raw_utxo in raw_utxos:
+            value = int(float(raw_utxo["value"]) * SATOSHIS_PER_COIN)
+            tx_hash = raw_utxo["txid"]
             block = self.get_block_by_tx(tx_hash)
-            vout = raw_tx_in["output_no"]
+            vout = raw_utxo["output_no"]
 
-            txin = TxIn(satoshi_value, block, OutPoint(lx(tx_hash), vout))
-            tx_ins.append(txin)
+            tx_in = TxIn(OutPoint(lx(tx_hash), vout))
+            tx_out = TxOut(value, address.to_scriptPubKey())
 
-        return tx_ins
+            utxo = Utxo(block, tx_in, tx_out)
+            utxos.append(utxo)
+
+        return utxos
 
 
     def query_api(self, query: str, param: Optional[Union[str, int]] = None):
@@ -111,3 +128,5 @@ class BlockExplorerClient(BlockchainClientInterface):
             raise BlockExplorerAPIError(response.status_code)
 
         return json.loads(response.text)["data"]
+
+

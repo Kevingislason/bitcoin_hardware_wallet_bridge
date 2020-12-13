@@ -1,38 +1,41 @@
 {
-    "master_xpub": "tpubD6NzVbkrYhZ4YeGcbzn5YXU24FkAErRtedfMj7b9Rr2cW9WFSVE4DNtd6fBay4YAWJkkRZtmfmPnBtiizC9Q9idRmrijZ1D61Yfov15dD8F",
-    "address_type": "T_P2PKHCoinAddress",
+    "wallet_xpub": "tpubDBWt1fvasp7THB33FXDXRK7C9JXBbZnQgZHGKyE9k6jPTitQL1jw9tC3R17YVQd7NAeAZY6FYVGBU43yZj3GSF14jko4Q3pDAUwLukoj4Gh",
+    "master_fingerprint": "a470215f",
+    "address_type": "P2SHCoinAddress",
     "current_block": {
-        "hash": "00000000000000950cc325de4ec4116d2d253f0d5dbcdebcb3ec74e975d14c57",
-        "number": 1864738,
-        "prev_hash": "0000000000000012b6bc7031bfa805ce82fc01d3226d7058f2b5a7cc6cd785f6"
+        "hash": "000000000000001d1b19d7993695af0b2a764e72d641f7eb9ddf98213a6fa585",
+        "number": 1895622,
+        "prev_hash": "000000000000003b281f8410f87e4ba60b18490edc69ba81806a5da98692d68d"
     },
     "external_addresses": [
         {
             "was_recovered": true,
             "is_fresh": false,
-            "tx_ins": [
+            "utxos": [
                 {
-                    "satoshi_value": 100000,
                     "is_awaiting_spend": false,
                     "block": {
-                        "hash": "00000000000000ef46962afbc2bebc0f871b1e538c4936bc30d8497e0f1efb16",
-                        "number": 1837090,
+                        "hash": "00000000000000b10143cb479f104060f835cf6ddb0409ffbf15c8736fca1221",
+                        "number": 1892494,
                         "prev_hash": null
                     },
                     "prevout": {
-                        "hash": "2977a38ee89bace43dccc383959738f85cd20080e8de46bc513364df65320ccf",
-                        "n": 0
-                    }
+                        "hash": "4f5dec4ebaeb47caf4750f04fe37b50d474147efce0e61978fcc79a9d89c1474",
+                        "n": 1
+                    },
+                    "value": 100000,
+                    "script_pubkey": "a91415d05ced416c395b4db9309b9b26625568b5370f87"
                 }
             ],
             "label": null
-        },
+        }
+    ],
+    "change_addresses": [
         {
             "was_recovered": false,
             "is_fresh": true,
-            "tx_ins": [],
-            "label": "ABC"
+            "utxos": [],
+            "label": null
         }
-    ],
-    "change_addresses": []
+    ]
 }

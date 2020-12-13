@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 
 from bitcointx.core import satoshi_to_coins
 
-from models.serial_connection_state import SerialConnectionState
+from controllers.main_controller import MainController
 from models.watch_only_wallet import WatchOnlyWallet
 from persistence.config import (
     Config, BalanceUnits, ChainParameters, BlockchainClient
@@ -13,14 +13,13 @@ from persistence.config import (
 class StatusBarView(QStatusBar):
 
     watch_only_wallet: WatchOnlyWallet
-    serial_connection_state: SerialConnectionState
+    controller: MainController
 
-    def __init__(self, watch_only_wallet: WatchOnlyWallet,
-                serial_connection_state: SerialConnectionState):
+    def __init__(self, controller: MainController, watch_only_wallet: WatchOnlyWallet):
 
       super().__init__()
       self.watch_only_wallet = watch_only_wallet
-      self.serial_connection_state = serial_connection_state
+      self.controller = controller
 
       self.balance_label_container = QWidget()
       self.balance_label_container.layout = QHBoxLayout()
@@ -39,6 +38,7 @@ class StatusBarView(QStatusBar):
       self.watch_only_wallet.spendable_balance_satoshis_changed.connect(
         self.on_spendable_balance_changed
       )
+      self.controller.network_connection.connect(self.on_network_connection_update)
 
       spendable_balance = self.watch_only_wallet.spendable_balance_satoshis
       self.display_spendable_balance(spendable_balance)
@@ -46,6 +46,13 @@ class StatusBarView(QStatusBar):
     @pyqtSlot(int)
     def on_spendable_balance_changed(self, balance: int):
         self.display_spendable_balance(balance)
+
+    @pyqtSlot(bool)
+    def on_network_connection_update(self, is_connected: bool):
+        if is_connected:
+            self.connection_label.setText("Connected")
+        else:
+            self.connection_label.setText("<font color='red'>Disconnected</font>")
 
 
     def display_spendable_balance(self, balance: int):

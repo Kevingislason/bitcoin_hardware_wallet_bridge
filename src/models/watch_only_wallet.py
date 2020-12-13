@@ -9,7 +9,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 
 from bitcoin_types.block import Block
-from bitcoin_types.tx_in import TxIn
+from bitcoin_types.utxo import Utxo
 from bitcoin_types.wallet_address import WalletAddress
 from constants.confirmation_constants import MINIMUM_CONFIRMATIONS
 
@@ -19,7 +19,7 @@ from constants.confirmation_constants import MINIMUM_CONFIRMATIONS
 class WatchOnlyWallet(QObject):
 
     # Wallet state
-    wallet_xpub: ExtPubKey
+    xpub: ExtPubKey
     address_type: AddressType
     external_addresses: MutableMapping[str, WalletAddress]
     change_addresses: MutableMapping[str, WalletAddress]
@@ -36,13 +36,15 @@ class WatchOnlyWallet(QObject):
 
     def load(
         self,
-        wallet_xpub: ExtPubKey,
+        xpub: ExtPubKey,
+        master_fingerprint: bytes,
         address_type: AddressType,
         current_block: Block,
         external_addresses: List[WalletAddress],
         change_addresses: List[WalletAddress]
     ):
-        self.wallet_xpub = wallet_xpub
+        self.xpub = xpub
+        self.master_fingerprint = master_fingerprint
         self.address_type = address_type
         self.current_block = current_block
         # Store change and external addresses in ordered dicts mapped to the address string
@@ -53,13 +55,26 @@ class WatchOnlyWallet(QObject):
             [(str(address), address) for address in change_addresses]
         )
 
-    #todo: make this into a property
-    def addresses_iter(self) -> List[WalletAddress]:
-        return chain(self.external_addresses.values(),self.change_addresses.values())
+    def get_address(self, address_str: str):
+        if self.external_addresses.get(address_str):
+            return self.external_addresses[address_str]
+        else:
+            return self.change_addresses.get(address_str)
+
+    @property
+    def addresses(self) -> List[WalletAddress]:
+        return list(chain(self.external_addresses.values(),self.change_addresses.values()))
 
     @property
     def ui_addresses(self) -> List[WalletAddress]:
         return [address for address in self.external_addresses.values() if not address.was_recovered][::-1]
+
+    @property
+    def utxos(self) -> List[Utxo]:
+        return [
+            utxo for address in self.addresses
+            for utxo in address.utxos
+        ]
 
     def refresh_balances(self):
         # Spendable_balance and unspendable_balance are what users see,
@@ -67,16 +82,16 @@ class WatchOnlyWallet(QObject):
         # This function lets us control when to reconcile the two,
         # so as to prevent the display balances from being too "jumpy"
         self.unspendable_balance_satoshis = sum(
-            tx_in.satoshi_value
-            for address in self.addresses_iter()
-            for tx_in in address.tx_ins
-            if tx_in.is_pending_confirmation(self.current_block)
+            utxo.value
+            for address in self.addresses
+            for utxo in address.utxos
+            if utxo.is_pending_confirmation(self.current_block)
         )
         self.spendable_balance_satoshis = sum(
-            tx_in.satoshi_value
-            for address in self.addresses_iter()
-            for tx_in in address.tx_ins
-            if tx_in.is_spendable(self.current_block)
+            utxo.value
+            for address in self.addresses
+            for utxo in address.utxos
+            if utxo.is_spendable(self.current_block)
         )
 
         self.spendable_balance_satoshis_changed.emit(

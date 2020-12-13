@@ -6,8 +6,8 @@ from PyQt5.QtGui import *
 
 from controllers.main_controller import MainController
 from models.watch_only_wallet import WatchOnlyWallet
-from views.address_detail_view import AddressDetailView
-from views.address_list_view import AddressListView
+from views.receive.address_detail_view import AddressDetailView
+from views.receive.address_list_view import AddressListView
 
 class ReceiveView(QWidget):
     controller: MainController
