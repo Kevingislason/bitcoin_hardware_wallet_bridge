@@ -23,7 +23,7 @@ class ReceiveView(QWidget):
 
 
       self.address_list = AddressListView(controller, watch_only_wallet)
-      self.address_details = AddressDetailView(watch_only_wallet)
+      self.address_details = AddressDetailView(controller, watch_only_wallet)
 
       self.address_list.list.itemSelectionChanged.connect(
           partial(

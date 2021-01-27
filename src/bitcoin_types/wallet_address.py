@@ -1,7 +1,6 @@
 from typing import List
 
 
-from bitcointx.core.key import BIP32Path
 from bitcointx.wallet import (
   CCoinAddress,
   CPubKey as PubKey,
@@ -17,17 +16,20 @@ from bitcointx.wallet import (
 from bitcointx.core.serialize import Hash160
 from bitcointx.core.script import CScript, OP_HASH160, OP_EQUAL
 
+from bitcoin_types.hd_key_path import HDKeyPath
 from bitcoin_types.history_event import HistoryEvent
 from bitcoin_types.utxo import Utxo
 from constants.hd_key_path_constants import (
-    BIP_44_KEYPATH,
-    BIP_49_KEYPATH,
-    BIP_84_KEYPATH,
-    MAINNET_KEYPATH,
-    TESTNET_KEYPATH,
-    FIRST_ACCOUNT_KEYPATH,
-    EXTERNAL_CHAIN_KEYPATH,
-    CHANGE_CHAIN_KEYPATH,
+    bip_44_keypath,
+    bip_49_keypath,
+    bip_84_keypath,
+    mainnet_keypath,
+    testnet_keypath,
+    first_account_keypath,
+    external_chain_keypath,
+    change_chain_keypath,
+    paths_are_equal,
+    BIP_KEYPATH_INDEX,
     CHANGE_KEYPATH_INDEX,
     CHILD_NUMBER_KEYPATH_INDEX,
     APP_BASE_KEYPATH_INDEX
@@ -43,14 +45,14 @@ class WalletAddress:
     _address: CCoinAddress
     _utxos: List[Utxo] #todo: make dict
     pub_key: PubKey
-    key_path: str
+    key_path: HDKeyPath
     was_recovered: bool
     is_fresh: bool
     label: str
 
     def __init__(self,
                  wallet_xpub: ExtPubKey,
-                 address_type: AddressType,
+                 base_keypath: HDKeyPath,
                  child_number: int,
                  is_change_address: bool = False,
                  was_recovered: bool = False,
@@ -59,9 +61,9 @@ class WalletAddress:
                  label: str = None
                 ):
 
-        self._set_key_path(address_type, is_change_address, child_number)
+        self._set_key_path(base_keypath, is_change_address, child_number)
         self._set_pubkey(wallet_xpub)
-        self._derive_address(address_type)
+        self._derive_address()
         self.was_recovered = was_recovered
         self.is_fresh = is_fresh
         self.label = label
@@ -74,11 +76,9 @@ class WalletAddress:
     def __str__(self):
         return str(self._address)
 
-
     @property
     def utxos(self) -> List[Utxo]:
         return self._utxos
-
 
     @utxos.setter
     def utxos(self, utxos: List[Utxo]):
@@ -91,25 +91,21 @@ class WalletAddress:
             utxo.address = str(self)
 
     @property
-    def child_number(self):
+    def child_number(self) -> int:
         return self.key_path[CHILD_NUMBER_KEYPATH_INDEX]
 
-
     @property
-    def is_change_address(self):
+    def is_change_address(self) -> bool:
         return self.key_path[CHANGE_KEYPATH_INDEX] == 1
-
 
     def to_scriptPubKey(self):
         return self._address.to_scriptPubKey()
-
 
     def to_redeemScript(self):
         if isinstance(self._address, P2SHAddress):
             return self.make_wrapped_segwit_redeem_script()
         else:
             return self._address.to_redeemScript()
-
 
     def to_json(self):
         return {
@@ -119,46 +115,25 @@ class WalletAddress:
             "label": self.label
         }
 
-
-    def _set_key_path(self, address_type: AddressType, is_change_address: bool, child_number: int):
-        if address_type is P2PKHAddress:
-            bip_keypath = BIP_44_KEYPATH
-        elif address_type is P2SHAddress:
-            bip_keypath = BIP_49_KEYPATH
-        elif address_type is P2WPKHAddress:
-            bip_keypath = BIP_84_KEYPATH
-        else:
-            raise Exception
-
+    def _set_key_path(self, base_keypath: HDKeyPath, is_change_address: bool, child_number: int):
         chain_params = Config.get_chain_parameters()
-        if chain_params == ChainParameters.TESTNET:
-            coin_type_keypath = TESTNET_KEYPATH
-        elif chain_params == ChainParameters.MAINNET:
-            coin_type_keypath = MAINNET_KEYPATH
-
-        account_keypath = FIRST_ACCOUNT_KEYPATH
-
         if is_change_address:
-            change_keypath = CHANGE_CHAIN_KEYPATH
+            change_keypath = change_chain_keypath()
         else:
-            change_keypath = EXTERNAL_CHAIN_KEYPATH
-
-        self.key_path = BIP32Path(
-            f"{bip_keypath}{coin_type_keypath}{account_keypath}{change_keypath}{child_number}"
-        )
-
+            change_keypath = external_chain_keypath()
+        self.key_path = base_keypath + change_keypath + HDKeyPath(str(child_number))
 
     def _set_pubkey(self, wallet_xpub):
         app_keypath = self.key_path[APP_BASE_KEYPATH_INDEX:]
         self.pub_key = wallet_xpub.derive_path(app_keypath).pub
 
-
-    def _derive_address(self, address_type):
-        if address_type is P2PKHAddress:
+    def _derive_address(self):
+        bip_keypath = HDKeyPath(self.key_path[:BIP_KEYPATH_INDEX])
+        if bip_keypath == bip_44_keypath():
             self._address = P2PKHAddress.from_pubkey(self.pub_key)
-        elif address_type is P2WPKHAddress:
+        elif bip_keypath == bip_84_keypath():
             self._address = P2WPKHAddress.from_pubkey(self.pub_key)
-        elif address_type is P2SHAddress:
+        elif bip_keypath == bip_49_keypath():
             self._address = WalletAddress._make_wrapped_segwit_address(self.pub_key)
         else:
             raise Exception
@@ -171,6 +146,7 @@ class WalletAddress:
         script_pubkey = CScript([OP_HASH160, redeem_script_hash, OP_EQUAL])
         return P2SHAddress.from_scriptPubKey(script_pubkey)
 
-
-    def _make_wrapped_segwit_redeem_script(self):
-        raise Exception("Unimplemented")
+    @staticmethod
+    def _make_wrapped_segwit_redeem_script(address_pubkey):
+        # raise Exception("Unimplemented")
+        return P2WPKHAddress.from_pubkey(address_pubkey).to_scriptPubKey()

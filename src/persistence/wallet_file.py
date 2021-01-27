@@ -17,6 +17,7 @@ from bitcointx.wallet import (
 )
 
 from bitcoin_types.block import Block
+from bitcoin_types.hd_key_path import HDKeyPath
 from bitcoin_types.wallet_address import WalletAddress
 from bitcoin_types.utxo import Utxo
 from models.watch_only_wallet import WatchOnlyWallet
@@ -31,7 +32,7 @@ class WalletFile:
         wallet_data = {
             "wallet_xpub": str(wallet.xpub),
             "master_fingerprint": b2x(wallet.master_fingerprint),
-            "address_type": wallet.address_type.__name__,
+            "base_keypath": str(wallet.base_keypath),
             "current_block": wallet.current_block.to_json(),
             "external_addresses": [
                 address.to_json() for address in wallet.external_addresses.values() #todo: make property
@@ -40,7 +41,6 @@ class WalletFile:
                 address.to_json() for address in wallet.change_addresses.values() #todo: make property
             ],
         }
-        #os.remove(cls.PATH)
         with open(cls.PATH, "w") as wallet_file:
             json.dump(wallet_data, wallet_file, indent=4)
 
@@ -71,9 +71,7 @@ class WalletFile:
             wallet_json = json.load(rf)
             wallet_xpub = ExtPubKey(wallet_json["wallet_xpub"])
             master_fingerprint = x(wallet_json["master_fingerprint"])
-            # dumb hack to get the right address type class from bitcoin tx from a string
-            # todo: at least make a util method for this
-            address_type = globals()[wallet_json["address_type"]]
+            base_keypath = HDKeyPath(wallet_json["base_keypath"])
             current_block = Block.from_json(wallet_json["current_block"])
             raw_external_addresses = wallet_json["external_addresses"]
             raw_change_addresses = wallet_json["change_addresses"]
@@ -81,7 +79,7 @@ class WalletFile:
             external_addresses = [
                 WalletAddress(
                     wallet_xpub,
-                    address_type,
+                    base_keypath,
                     child_number,
                     False,
                     address["was_recovered"],
@@ -95,7 +93,7 @@ class WalletFile:
             change_addresses = [
                 WalletAddress(
                     wallet_xpub,
-                    address_type,
+                    base_keypath,
                     child_number,
                     True,
                     address["was_recovered"],
@@ -105,4 +103,4 @@ class WalletFile:
                 for child_number, address in enumerate(raw_change_addresses)
             ]
 
-            return (wallet_xpub, master_fingerprint, address_type, current_block, external_addresses, change_addresses)
+            return (wallet_xpub, master_fingerprint, base_keypath, current_block, external_addresses, change_addresses)

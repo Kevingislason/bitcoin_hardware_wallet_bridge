@@ -5,13 +5,14 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import qrcode
 
-
+from controllers.main_controller import MainController
 from models.watch_only_wallet import WatchOnlyWallet
 
 
 class AddressDetailView(QFrame):
-    def __init__(self, watch_only_wallet: WatchOnlyWallet):
+    def __init__(self, controller: MainController, watch_only_wallet: WatchOnlyWallet):
       super().__init__()
+      self.controller = controller
       self.watch_only_wallet = watch_only_wallet
 
 
@@ -116,6 +117,9 @@ class AddressDetailView(QFrame):
 
       # Set key path
       self.key_path_text.setText(f"Key Path: {address.key_path}")
+
+      # Have hardware wallet display the address if it is initialized
+      self.controller.request_hardware_wallet_display_address(address.key_path)
 
 
 

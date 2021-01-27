@@ -20,7 +20,7 @@ class WatchOnlyWallet(QObject):
 
     # Wallet state
     xpub: ExtPubKey
-    address_type: AddressType
+    base_keypath: str
     external_addresses: MutableMapping[str, WalletAddress]
     change_addresses: MutableMapping[str, WalletAddress]
     current_block: Block
@@ -29,7 +29,7 @@ class WatchOnlyWallet(QObject):
 
     # Pyqt Signals
     unspendable_balance_satoshis_changed = pyqtSignal(int)
-    spendable_balance_satoshis_changed = pyqtSignal(int) #todo: rename to pending balance
+    spendable_balance_satoshis_changed = pyqtSignal(int)
 
     def __init__(self):
         super().__init__()
@@ -38,14 +38,14 @@ class WatchOnlyWallet(QObject):
         self,
         xpub: ExtPubKey,
         master_fingerprint: bytes,
-        address_type: AddressType,
+        base_keypath: str,
         current_block: Block,
         external_addresses: List[WalletAddress],
         change_addresses: List[WalletAddress]
     ):
         self.xpub = xpub
         self.master_fingerprint = master_fingerprint
-        self.address_type = address_type
+        self.base_keypath = base_keypath
         self.current_block = current_block
         # Store change and external addresses in ordered dicts mapped to the address string
         self.external_addresses = OrderedDict(
@@ -54,6 +54,7 @@ class WatchOnlyWallet(QObject):
         self.change_addresses =  OrderedDict(
             [(str(address), address) for address in change_addresses]
         )
+        self.refresh_balances()
 
     def get_address(self, address_str: str):
         if self.external_addresses.get(address_str):
@@ -75,6 +76,10 @@ class WatchOnlyWallet(QObject):
             utxo for address in self.addresses
             for utxo in address.utxos
         ]
+
+    @property
+    def last_change_address(self):
+        return next(reversed(self.change_addresses.items()))[1]
 
     def refresh_balances(self):
         # Spendable_balance and unspendable_balance are what users see,

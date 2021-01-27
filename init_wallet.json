@@ -1,0 +1,9 @@
+{
+    "master_fingerprint": "f0718c8e",
+    "wallet_xpubs": [
+        "tpubDDgMzfqDv5VABveV4QzBag2EL7oUYmZ9UGXndRNqdzB2A1MP23gbJviBrj7i8W1L8oGWmRS5qxjLrUrH3Dw3VjUBbTFoBnxjSkoH3MfKpZY"
+    ],
+    "key_paths": {
+        "tpubDDgMzfqDv5VABveV4QzBag2EL7oUYmZ9UGXndRNqdzB2A1MP23gbJviBrj7i8W1L8oGWmRS5qxjLrUrH3Dw3VjUBbTFoBnxjSkoH3MfKpZY": "m/44'/1'/0'"
+    }
+}

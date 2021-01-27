@@ -3,10 +3,12 @@ import requests
 from typing import List, Optional, Tuple, Union
 
 from bitcointx.core import (
+    CTransaction as Transaction,
     COutPoint as OutPoint,
     CMutableTxIn as TxIn,
     CMutableTxOut as TxOut,
-    lx
+    lx,
+    x
 )
 from bitcointx.wallet import (
     CCoinAddress as Address,
@@ -26,6 +28,7 @@ class BlockExplorerClient(BlockchainClientInterface):
 
     class Query:
         TX = "tx"
+        GET_TX = "get_tx"
         GET_UNSPENT_TX = "get_tx_unspent"
         GET_RECEIVED_TX = "get_tx_received"
         GET_NETWORK_INFO = "get_info"
@@ -86,6 +89,12 @@ class BlockExplorerClient(BlockchainClientInterface):
         block_number = tx_data["block_no"]
         block_hash = tx_data["blockhash"]
         return Block(block_hash, block_number)
+
+
+    def get_transaction(self, tx_hash: str) -> Transaction:
+        tx_data = self.query_api(self.Query.GET_TX, tx_hash)
+        tx_hex = tx_data["tx_hex"]
+        return Transaction.deserialize(x(tx_hex))
 
 
     def block_is_orphan(self, block: Block) -> bool:

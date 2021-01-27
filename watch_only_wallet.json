@@ -1,11 +1,11 @@
 {
-    "wallet_xpub": "tpubDBWt1fvasp7THB33FXDXRK7C9JXBbZnQgZHGKyE9k6jPTitQL1jw9tC3R17YVQd7NAeAZY6FYVGBU43yZj3GSF14jko4Q3pDAUwLukoj4Gh",
-    "master_fingerprint": "a470215f",
-    "address_type": "P2SHCoinAddress",
+    "wallet_xpub": "tpubDDgMzfqDv5VABveV4QzBag2EL7oUYmZ9UGXndRNqdzB2A1MP23gbJviBrj7i8W1L8oGWmRS5qxjLrUrH3Dw3VjUBbTFoBnxjSkoH3MfKpZY",
+    "master_fingerprint": "f0718c8e",
+    "base_keypath": "m/44'/1'/0'",
     "current_block": {
-        "hash": "000000000000001d1b19d7993695af0b2a764e72d641f7eb9ddf98213a6fa585",
-        "number": 1895622,
-        "prev_hash": "000000000000003b281f8410f87e4ba60b18490edc69ba81806a5da98692d68d"
+        "hash": "0000000000000005880a72c42f14f7bcf83523e5f1958fd2d7b9d87396b31c3d",
+        "number": 1905821,
+        "prev_hash": "0000000090550763883eb6e3c3345e29c5dc028839289b2010c81703dbfe24a3"
     },
     "external_addresses": [
         {
@@ -15,19 +15,31 @@
                 {
                     "is_awaiting_spend": false,
                     "block": {
-                        "hash": "00000000000000b10143cb479f104060f835cf6ddb0409ffbf15c8736fca1221",
-                        "number": 1892494,
+                        "hash": "000000000000000ac8dfea29245bbc293044e5c43b24cb0b9ae28d4d7488b890",
+                        "number": 1903436,
                         "prev_hash": null
                     },
                     "prevout": {
-                        "hash": "4f5dec4ebaeb47caf4750f04fe37b50d474147efce0e61978fcc79a9d89c1474",
+                        "hash": "fb36ffa6b3fa22be24cfa5ae715e6b4f40c327611ea720834c61158124936364",
                         "n": 1
                     },
                     "value": 100000,
-                    "script_pubkey": "a91415d05ced416c395b4db9309b9b26625568b5370f87"
+                    "script_pubkey": "ac88a43c7543e5ee91e9f7eb7b5fd86c4385b76509bc14a976"
                 }
             ],
             "label": null
+        },
+        {
+            "was_recovered": false,
+            "is_fresh": true,
+            "utxos": [],
+            "label": "Address test"
+        },
+        {
+            "was_recovered": false,
+            "is_fresh": true,
+            "utxos": [],
+            "label": "Address 2"
         }
     ],
     "change_addresses": [

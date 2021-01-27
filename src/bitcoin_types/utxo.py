@@ -1,11 +1,14 @@
 from typing import Union
 
+from bitcointx.base58 import CBase58Data as Base58Data
 from bitcointx.core import (
-    b2x,
-    x,
+    b2lx,
+    lx,
     CMutableTxIn as TxIn,
     CMutableTxOut as TxOut,
-    COutPoint as OutPoint
+    COutPoint as OutPoint,
+    CTransaction as Transaction
+
 )
 from bitcointx.core.script import CScript as Script
 
@@ -29,17 +32,18 @@ from constants.transaction_size_constants import (
 )
 
 class Utxo():
-    tx_in: TxIn
     tx_out: TxOut
+    tx_in: TxIn
+    transaction: Transaction
     block: Block
     address: str
     is_awaiting_spend: bool = False
 
 
     def __init__(self, block: Block, tx_in: TxIn, tx_out: TxOut):
+        self.block = block
         self.tx_in = tx_in
         self.tx_out = tx_out
-        self.block = block
 
     def __eq__(self, other):
         return self.tx_in == other.tx_in and self.tx_out == other.tx_out
@@ -52,6 +56,14 @@ class Utxo():
     def prevout(self):
         return self.tx_in.prevout
 
+    @property
+    def tx_hash(self):
+        return b2lx(self.prevout.hash)
+
+    @property
+    def is_witness_utxo(self):
+        return False #todo: idk what this means honestly
+
 
     def is_spendable(self, current_block: Block):
         return self.confirmations(current_block) >= MINIMUM_CONFIRMATIONS and not self.is_awaiting_spend
@@ -59,6 +71,8 @@ class Utxo():
 
     def is_pending_confirmation(self, current_block: Block):
         return self.confirmations(current_block) < MINIMUM_CONFIRMATIONS and not self.is_awaiting_spend
+
+
 
 
     def confirmations(self, current_block: Block):
@@ -105,11 +119,11 @@ class Utxo():
             "is_awaiting_spend": self.is_awaiting_spend,
             "block": self.block.to_json(),
             "prevout": {
-                "hash": b2x(self.prevout.hash),
+                "hash": b2lx(self.prevout.hash),
                 "n": self.prevout.n
             },
             "value": self.value,
-            "script_pubkey": b2x(self.tx_out.scriptPubKey)
+            "script_pubkey": b2lx(self.tx_out.scriptPubKey)
         }
 
 
@@ -119,12 +133,12 @@ class Utxo():
             Block.from_json(json["block"]),
             TxIn(
                 OutPoint(
-                    x(json["prevout"]["hash"]),
+                    lx(json["prevout"]["hash"]),
                     json["prevout"]["n"]
                 )
             ),
             TxOut(
                 json["value"],
-                x(json["script_pubkey"])
+                lx(json["script_pubkey"])
             )
         )

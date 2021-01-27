@@ -13,7 +13,7 @@ from networking.serial.serial_client import SerialClient
 from persistence.config import (
     Config, BlockchainClient, BalanceUnits, ChainParameters
 )
-from persistence.wallet_file import WalletFile
+from persistence.init_wallet_file import InitWalletFile
 from views.initialize_wallet_view import InitializeWalletView
 from views.status_bar_view import StatusBarView
 from views.wallet_view import WalletView
@@ -35,13 +35,10 @@ class BitcoinHardwareWalletBridge(QMainWindow):
 
         self.init_ui()
 
-        # Init models
         self.watch_only_wallet = WatchOnlyWallet()
-
         self.main_controller = MainController(self.watch_only_wallet)
 
-        # Init views
-        self.initialize_wallet_view = InitializeWalletView()
+        self.initialize_wallet_view = InitializeWalletView(self.main_controller, self.change_view)
         self.wallet_view = WalletView(self.main_controller, self.watch_only_wallet)
         self.status_bar_view = StatusBarView(self.main_controller, self.watch_only_wallet)
 
@@ -49,8 +46,11 @@ class BitcoinHardwareWalletBridge(QMainWindow):
         self.central_widget.addWidget(self.wallet_view)
         self.setStatusBar(self.status_bar_view)
 
-        if WalletFile.exists():
+        if InitWalletFile.exists():
             self.change_view(WalletView.VIEW_INDEX)
+
+        self.main_controller.sync_to_blockchain_loop_async()
+        self.main_controller.sync_to_hardware_wallet_loop_async()
 
     def init_ui(self):
         # Set window title

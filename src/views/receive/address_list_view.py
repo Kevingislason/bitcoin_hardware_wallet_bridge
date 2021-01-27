@@ -14,25 +14,20 @@ class AddressListView(QFrame):
       self.controller = controller
       self.watch_only_wallet = watch_only_wallet
 
-      # Address details
       self.size_policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
       self.size_policy.setHorizontalStretch(2)
       self.setSizePolicy(self.size_policy)
       self.layout = QVBoxLayout()
       self.setLayout(self.layout)
 
-
       self.scroll = QScrollArea()
       self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
       self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
       self.scroll.setWidgetResizable(True)
       self.scroll.setAlignment(Qt.AlignTop)
-
       self.list = QListWidget()
-
       self.scroll.setWidget(self.list)
 
-      # -
       for address in self.watch_only_wallet.ui_addresses:
           address_widget = QListWidgetItem(address.label)
           icon_style = QStyle.SP_DialogYesButton if address.is_fresh else QStyle.SP_DialogNoButton
@@ -47,18 +42,12 @@ class AddressListView(QFrame):
       self.new_address_name_input.setPlaceholderText("Label (Required)")
       self.new_address_name_input.setAlignment(Qt.AlignBottom)
 
-
       self.new_address_button = QPushButton("Generate New Receiving Address")
       self.new_address_button.clicked.connect(self.handle_new_address_button_clicked)
-      # self.new_address_button.setAlignment(Qt.AlignBottom)
 
       self.layout.addWidget(self.scroll)
       self.layout.addWidget(self.new_address_name_input)
       self.layout.addWidget(self.new_address_button)
-
-
-    def make_address_qr_code(self):
-      pass
 
 
     def handle_new_address_button_clicked(self):
