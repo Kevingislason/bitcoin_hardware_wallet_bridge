@@ -2,6 +2,8 @@
 *.conf
 *.bfe
 *.ini
+hardware_wallet.json
+watch_only_wallet.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
