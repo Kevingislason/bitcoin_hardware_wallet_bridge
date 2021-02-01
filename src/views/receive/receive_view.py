@@ -1,13 +1,14 @@
 from functools import partial
 
 from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from controllers.main_controller import MainController
 from models.watch_only_wallet import WatchOnlyWallet
 from views.receive.address_detail_view import AddressDetailView
 from views.receive.address_list_view import AddressListView
+
 
 class ReceiveView(QWidget):
     controller: MainController
@@ -31,8 +32,8 @@ class ReceiveView(QWidget):
             self.address_list.list
           )
       )
+      if self.watch_only_wallet.ui_addresses:
+          self.address_list.list.setCurrentRow(0)
 
       self.layout.addWidget(self.address_list)
       self.layout.addWidget(self.address_details)
-
-

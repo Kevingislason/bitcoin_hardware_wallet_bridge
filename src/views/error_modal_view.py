@@ -1,6 +1,6 @@
 from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 
 class ErrorMessage:
@@ -9,6 +9,11 @@ class ErrorMessage:
     INSUFFICIENT_FUNDS = "Insufficient funds"
     INSUFFICIENT_FUNDS_AFTER_FEES = "Insufficient funds after fees"
     INVALID_SPEND = "Amount is invalid"
+    TX_REJECTED = "Transaction canceled;\n rejected by hardware wallet"
+    TX_BROADCAST_FAILED = "Transaction canceled;\n failed to broadcast"
+    SERIAL_DISCONNECT = "Transaction canceled;\n hardware wallet disconnected"
+    GAP_LIMIT_REACHED = "Gap limit reached;\n use an existing address\n before generating new addresses"
+
 
 class ErrorModal(QDialog):
     def __init__(self):
@@ -22,8 +27,12 @@ class ErrorModal(QDialog):
         self.layout.addWidget(self.error_message)
 
         self.okay_button = QPushButton("Okay")
-        self.layout.addWidget(self.okay_button)
+        self.okay_button.setMaximumWidth(100)
+        self.okay_button.setAutoDefault(False)
+        self.okay_button.setDefault(False)
+        self.layout.addWidget(self.okay_button, alignment=Qt.AlignCenter)
         self.okay_button.clicked.connect(self.handle_click_okay_button)
+
 
 
     def handle_click_okay_button(self):
@@ -34,4 +43,3 @@ class ErrorModal(QDialog):
         self.error_message.setText(error_message)
         self.exec_()
         self.activateWindow()
-        # self.setFocus()

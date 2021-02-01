@@ -1,6 +1,7 @@
 from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
 
 class FeeSelectionForm(QWidget):
     def __init__(self):
@@ -9,7 +10,7 @@ class FeeSelectionForm(QWidget):
       self.layout = QHBoxLayout()
       self.setLayout(self.layout)
 
-      self.fee_selection_label = QLabel("Fee Rate:")
+      self.fee_selection_label = QLabel("Fee rate:")
       self.fee_selection_label.size_policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
       self.fee_selection_label.size_policy.setHorizontalStretch(1)
       self.fee_selection_label.setSizePolicy(self.fee_selection_label.size_policy)

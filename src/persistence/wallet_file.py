@@ -1,29 +1,19 @@
-from enum import Enum
-from typing import List, TypeVar
 import json
 import os
+from typing import List
 
-from bitcointx.core import (
-    b2x,
-    x,
-)
+from bitcointx.core import b2x, x
+from bitcointx.wallet import CCoinExtPubKey as ExtPubKey
+from bitcointx.wallet import (P2PKHCoinAddress, P2SHCoinAddress,
+                              P2WPKHCoinAddress)
 
-from bitcointx.wallet import (
-    T_CCoinAddress as AddressType,
-    CCoinExtPubKey as ExtPubKey,
-    P2PKHCoinAddress,
-    P2SHCoinAddress,
-    P2WPKHCoinAddress,
-)
-
-from bitcoin_types.block import Block
-from bitcoin_types.hd_key_path import HDKeyPath
-from bitcoin_types.wallet_address import WalletAddress
-from bitcoin_types.utxo import Utxo
+from models.block import Block
+from models.hd_key_path import HDKeyPath
+from models.utxo import Utxo
+from models.wallet_address import WalletAddress
 from models.watch_only_wallet import WatchOnlyWallet
 
 
-#todo: encrypt
 class WalletFile:
     PATH = "watch_only_wallet.json"
 
@@ -35,10 +25,10 @@ class WalletFile:
             "base_keypath": str(wallet.base_keypath),
             "current_block": wallet.current_block.to_json(),
             "external_addresses": [
-                address.to_json() for address in wallet.external_addresses.values() #todo: make property
+                address.to_json() for address in wallet.external_addresses.values()
             ],
             "change_addresses": [
-                address.to_json() for address in wallet.change_addresses.values() #todo: make property
+                address.to_json() for address in wallet.change_addresses.values()
             ],
         }
         with open(cls.PATH, "w") as wallet_file:

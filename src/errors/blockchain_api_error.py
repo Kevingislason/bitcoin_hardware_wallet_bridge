@@ -1,4 +1,4 @@
-class BlockExplorerAPIError(Exception):
+class BlockchainAPIError(Exception):
     status: int
 
     def __init__(self, status):

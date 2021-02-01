@@ -1,53 +1,12 @@
 {
-    "wallet_xpub": "tpubDDgMzfqDv5VABveV4QzBag2EL7oUYmZ9UGXndRNqdzB2A1MP23gbJviBrj7i8W1L8oGWmRS5qxjLrUrH3Dw3VjUBbTFoBnxjSkoH3MfKpZY",
-    "master_fingerprint": "f0718c8e",
-    "base_keypath": "m/44'/1'/0'",
+    "wallet_xpub": "tpubDDJ2oBGg9Kn7HMJ6Mboz4cbnodgNJAuUFbrpDgsS5AJ9A1c5A7YTHcKyKbGfdBvW38C1nMVQyZhnvoEYYvDfCUBejYm56fAtasbYFPmnhFS",
+    "master_fingerprint": "20ca125c",
+    "base_keypath": "m/84h/1h/0h",
     "current_block": {
-        "hash": "0000000000000005880a72c42f14f7bcf83523e5f1958fd2d7b9d87396b31c3d",
-        "number": 1905821,
-        "prev_hash": "0000000090550763883eb6e3c3345e29c5dc028839289b2010c81703dbfe24a3"
+        "hash": "00000000b55bb0f3276c4b4f403918268bc9b4d93a8e3570dba2808d53dde1ac",
+        "number": 1907073,
+        "prev_hash": "000000000000000f00e9fa5c607fffc0c04d424635a1070ea5f704325723c824"
     },
-    "external_addresses": [
-        {
-            "was_recovered": true,
-            "is_fresh": false,
-            "utxos": [
-                {
-                    "is_awaiting_spend": false,
-                    "block": {
-                        "hash": "000000000000000ac8dfea29245bbc293044e5c43b24cb0b9ae28d4d7488b890",
-                        "number": 1903436,
-                        "prev_hash": null
-                    },
-                    "prevout": {
-                        "hash": "fb36ffa6b3fa22be24cfa5ae715e6b4f40c327611ea720834c61158124936364",
-                        "n": 1
-                    },
-                    "value": 100000,
-                    "script_pubkey": "ac88a43c7543e5ee91e9f7eb7b5fd86c4385b76509bc14a976"
-                }
-            ],
-            "label": null
-        },
-        {
-            "was_recovered": false,
-            "is_fresh": true,
-            "utxos": [],
-            "label": "Address test"
-        },
-        {
-            "was_recovered": false,
-            "is_fresh": true,
-            "utxos": [],
-            "label": "Address 2"
-        }
-    ],
-    "change_addresses": [
-        {
-            "was_recovered": false,
-            "is_fresh": true,
-            "utxos": [],
-            "label": null
-        }
-    ]
+    "external_addresses": [],
+    "change_addresses": []
 }

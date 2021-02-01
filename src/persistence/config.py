@@ -5,7 +5,7 @@ from typing import Any
 
 class Field:
     BLOCKCHAIN_CLIENT = "Blockchain client"
-    CHAIN_PARAMETERS = "Chain parameters"
+    NETWORK = "Network"
     BALANCE_UNITS = "Balance units"
 
 
@@ -16,14 +16,14 @@ class BlockchainClient:
 
 # Required by python-bitcointx, see
 # https://github.com/Simplexum/python-bitcointx#selecting-the-chain-to-use
-class ChainParameters:
+class Network:
     REGTEST = "bitcoin/regtest"
     TESTNET = "bitcoin/testnet"
     MAINNET = "bitcoin"
 
 
 class BalanceUnits:
-    SATOSHIS = "Satoshis"
+    SATOSHIS = "satoshis"
     BTC = "BTC"
 
 
@@ -40,8 +40,8 @@ class Config:
         config.add_section("Config")
 
         config.set("Config", str(Field.BALANCE_UNITS), str(BalanceUnits.BTC))
-        config.set("Config", str(Field.CHAIN_PARAMETERS),
-                   str(ChainParameters.TESTNET))
+        config.set("Config", str(Field.NETWORK),
+                   str(Network.TESTNET))
         config.set("Config", str(Field.BLOCKCHAIN_CLIENT),
                    str(BlockchainClient.BLOCK_EXPLORER))
 
@@ -71,12 +71,12 @@ class Config:
         cls.set(Field.BLOCKCHAIN_CLIENT, blockchain_client)
 
     @classmethod
-    def get_chain_parameters(cls) -> ChainParameters:
-        return cls.get(Field.CHAIN_PARAMETERS)
+    def get_network(cls) -> Network:
+        return cls.get(Field.NETWORK)
 
     @classmethod
-    def set_chain_parameters(cls, chain_parameters: ChainParameters):
-        cls.set(Field.CHAIN_PARAMETERS, chain_parameters)
+    def set_network(cls, network: Network):
+        cls.set(Field.Network, network)
 
     @classmethod
     def get_balance_units(cls) -> BalanceUnits:

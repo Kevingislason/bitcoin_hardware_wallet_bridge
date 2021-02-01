@@ -1,9 +1,9 @@
 from typing import Optional
 
-from constants.genesis_block_constants import (
-  MAINNET_GENESIS_HASH, TESTNET_GENESIS_HASH
-)
-from persistence.config import Config, ChainParameters
+from constants.genesis_block_constants import (MAINNET_GENESIS_HASH,
+                                               TESTNET_GENESIS_HASH)
+from persistence.config import Config, Network
+
 
 class Block:
     hash: str
@@ -22,10 +22,10 @@ class Block:
 
     @classmethod
     def genesis_block(cls):
-      chain_params =  Config.get_chain_parameters()
-      if chain_params == ChainParameters.MAINNET:
+      network =  Config.get_network()
+      if network == Network.MAINNET:
         blockhash = MAINNET_GENESIS_HASH
-      elif chain_params == ChainParameters.TESTNET:
+      elif network == Network.TESTNET:
         blockhash = TESTNET_GENESIS_HASH
       return cls(blockhash, 0)
 

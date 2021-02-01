@@ -1,9 +1,10 @@
 
 from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
-from constants.money_constants import MAX_BTC, BTC_POINTS_PRECISION
+from constants.money_constants import BTC_POINTS_PRECISION, MAX_BTC
+
 
 class SendAmountForm(QWidget):
 

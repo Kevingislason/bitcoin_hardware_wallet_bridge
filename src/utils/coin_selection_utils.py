@@ -1,11 +1,11 @@
 from typing import List
 
 from bitcointx.core import b2x
+
+from bitcoin_coin_selection.selection_types.coin_selection import CoinSelection
 from bitcoin_coin_selection.selection_types.input_coin import InputCoin
 from bitcoin_coin_selection.selection_types.output_group import OutputGroup
-from bitcoin_coin_selection.selection_types.coin_selection import CoinSelection
-
-from bitcoin_types.utxo import Utxo
+from models.utxo import Utxo
 from models.watch_only_wallet import WatchOnlyWallet
 
 
@@ -36,6 +36,7 @@ def map_utxos_to_output_groups(wallet: WatchOnlyWallet) -> List[OutputGroup]:
                     Utxo.spend_size(wallet.addresses[0])
                 )
                 for utxo in address.utxos
+                if utxo.is_spendable(wallet.current_block)
             ]
             utxo_pool.append(OutputGroup(str(address), input_coins))
     return utxo_pool
@@ -44,5 +45,5 @@ def map_utxos_to_output_groups(wallet: WatchOnlyWallet) -> List[OutputGroup]:
 def get_total_effective_value(wallet: WatchOnlyWallet, fee_rate: int) -> int:
     utxo_pool = map_utxos_to_output_groups(wallet)
     for utxo in utxo_pool:
-      utxo.set_fee(fee_rate, fee_rate) # long term fee doesn't matter here
+      utxo.set_fee(fee_rate, fee_rate)
     return sum(utxo.effective_value for utxo in utxo_pool)

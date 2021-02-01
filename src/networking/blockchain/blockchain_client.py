@@ -1,30 +1,25 @@
 import json
-import requests
 from typing import List, Optional, Tuple, Union
 
-from bitcointx.core import (
-    CTransaction as Transaction,
-    COutPoint as OutPoint,
-    CMutableTxIn as TxIn,
-    CMutableTxOut as TxOut,
-    lx,
-    x
-)
-from bitcointx.wallet import (
-    CCoinAddress as Address,
-)
+import requests
+from bitcointx.core import CMutableTxIn as TxIn
+from bitcointx.core import CMutableTxOut as TxOut
+from bitcointx.core import COutPoint as OutPoint
+from bitcointx.core import CTransaction as Transaction
+from bitcointx.core import lx, x
+from bitcointx.wallet import CCoinAddress as Address
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+from requests.exceptions import ConnectionError
 
-from bitcoin_types.block import Block
-from bitcoin_types.utxo import Utxo
+from models.block import Block
+from models.utxo import Utxo
 from constants.money_constants import SATOSHIS_PER_COIN
-from persistence.config import Config, ChainParameters
-from errors.block_explorer_api_error import BlockExplorerAPIError
-from networking.blockchain.blockchain_client_interface import BlockchainClientInterface
+from errors.blockchain_api_error import BlockchainAPIError
+from persistence.config import Config, Network
 
 
-class BlockExplorerClient(BlockchainClientInterface):
+class BlockchainClient(QObject):
     URL = "https://sochain.com/api/v2/{query}/{network}/{param}"
-    FEE_URL = "https://api.blockchain.info/mempool/fees"
 
     class Query:
         TX = "tx"
@@ -39,25 +34,14 @@ class BlockExplorerClient(BlockchainClientInterface):
         TESTNET = "BTCTEST"
 
     network: str
+    connection = pyqtSignal(bool)
 
-    def __init__(self):
+    def __init__(self, app_network: str):
         super().__init__()
-        chain_parameters = Config.get_chain_parameters()
-        if chain_parameters == ChainParameters.MAINNET:
+        if app_network == Network.MAINNET:
             self.network = self.Network.MAINNET
-        elif chain_parameters == ChainParameters.TESTNET:
+        elif app_network == Network.TESTNET:
             self.network = self.Network.TESTNET
-
-
-    def get_current_fee_rate(self, is_priority: bool):
-        response = requests.get(self.FEE_URL)
-        if response.status_code != 200 and response.status_code != 404:
-            raise BlockExplorerAPIError(response.status_code)
-        if is_priority:
-            return json.loads(response.text)["priority"]
-        else:
-            return json.loads(response.text)["regular"]
-
 
     def get_most_recent_block(self) -> Block:
         network_info = self.query_api(self.Query.GET_NETWORK_INFO)
@@ -66,15 +50,6 @@ class BlockExplorerClient(BlockchainClientInterface):
         current_block_hash = current_block["blockhash"]
         prev_block_hash = current_block["previous_blockhash"]
         return Block(current_block_hash, current_block_number, prev_block_hash)
-
-
-    def get_block_by_number(self, block_number: int) -> Optional[Block]:
-        block = self.query_api(self.Query.GET_BLOCK, block_number)
-        block_hash = block.get("blockhash")
-        if block_hash:
-            prev_block_hash = block["previous_blockhash"]
-            return Block(block_hash, block_number, prev_block_hash)
-        return None
 
 
     def get_block_by_hash(self, block_hash: str) -> Block:
@@ -124,18 +99,19 @@ class BlockExplorerClient(BlockchainClientInterface):
 
         return utxos
 
-
     def query_api(self, query: str, param: Optional[Union[str, int]] = None):
-        response = requests.get(
-            self.URL.format(
-                query=query,
-                network=self.network,
-                param=param if param else "",
+        try:
+            response = requests.get(
+                self.URL.format(
+                    query=query,
+                    network=self.network,
+                    param=param if param else "",
+                )
             )
-        )
-        if response.status_code != 200 and response.status_code != 404:
-            raise BlockExplorerAPIError(response.status_code)
-
+        except ConnectionError as e:
+            self.connection.emit(False)
+            raise e
+        if response.status_code != 200:
+            raise BlockchainAPIError(response.status_code)
+        self.connection.emit(True)
         return json.loads(response.text)["data"]
-
-
